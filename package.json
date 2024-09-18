@@ -1,5 +1,5 @@
 {
-  "name": "@digasystems/capacitor-label-printer",
+  "name": "@ingageco/capacitor-label-printer",
   "version": "0.0.2",
   "description": "Provide a native interface to label printers",
   "cordova": {
