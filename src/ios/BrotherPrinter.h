@@ -3,7 +3,7 @@
 #import "BRUserDefaults.h"
 #import <BRLMPrinterKit/BRPtouchNetworkManager.h>
 #import <BRLMPrinterKit/BRPtouchPrinterKit.h>
-#import "BRBluetoothPrintOperation.h"
+// #import "BRBluetoothPrintOperation.h"
 #import "BRWLANPrintOperation.h"
 #define kPaperLabelName        @"paperLabelName"
 #define kPrintNumberOfPaperKey		@"numberOfCopies"
@@ -19,7 +19,7 @@ static NSString *const COMMUNICATION_RESULT_FOR_WLAN = @"communicationResultForW
 @property (retain, atomic) NSOperationQueue *operationQueue;
 
 -(void)findNetworkPrinters:(CDVInvokedUrlCommand*)command;
--(void)findBluetoothPrinters:(CDVInvokedUrlCommand*)command;
+// -(void)findBluetoothPrinters:(CDVInvokedUrlCommand*)command;
 -(void)findPrinters:(CDVInvokedUrlCommand*)command;
 -(void)setPrinter:(CDVInvokedUrlCommand*)command;
 -(void)printViaSDK:(CDVInvokedUrlCommand*)command;

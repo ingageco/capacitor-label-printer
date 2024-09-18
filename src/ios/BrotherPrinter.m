@@ -27,6 +27,7 @@
             @"Brother QL-710W",
             @"Brother QL-720NW",
             @"Brother QL-810W",
+            @"Brother QL-810Wc",
             @"Brother QL-820NWB",
             @"Brother PT-E550W",
             @"Brother PT-P750W",
@@ -51,6 +52,7 @@
             @"Brother QL-710W",
             @"Brother QL-720NW",
             @"Brother QL-810W",
+            @"Brother QL-810Wc",
             @"Brother QL-820NWB",
             @"Brother TD-2120N"];
 
@@ -206,22 +208,22 @@
 //    }];
 }
 
-- (void)findBluetoothPrinters:(CDVInvokedUrlCommand *)command {
-//	[self.commandDelegate runInBackground:^{
-    [self pairedDevicesWithCompletion:^(NSArray *bluetoothPrinters, NSError *error) {
-        if (error) {
-            [self.commandDelegate
-                    sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]]
-                          callbackId:command.callbackId];
-            return;
-        }
+// - (void)findBluetoothPrinters:(CDVInvokedUrlCommand *)command {
+// //	[self.commandDelegate runInBackground:^{
+//     [self pairedDevicesWithCompletion:^(NSArray *bluetoothPrinters, NSError *error) {
+//         if (error) {
+//             [self.commandDelegate
+//                     sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]]
+//                           callbackId:command.callbackId];
+//             return;
+//         }
 
-        [self.commandDelegate
-                sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:bluetoothPrinters]
-                      callbackId:command.callbackId];
-    }];
-//    }];
-}
+//         [self.commandDelegate
+//                 sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:bluetoothPrinters]
+//                       callbackId:command.callbackId];
+//     }];
+// //    }];
+// }
 
 - (void)findPrinters:(CDVInvokedUrlCommand *)command {
     NSLog(@"==== in findPrinters with callback id                = %@", command.callbackId);

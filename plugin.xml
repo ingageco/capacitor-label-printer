@@ -110,8 +110,6 @@
                 <pod name="BRLMPrinterKit" />
             </pods>
         </podspec>
-        <header-file src="src/ios/BRBluetoothPrintOperation.h" />
-        <source-file src="src/ios/BRBluetoothPrintOperation.m" />
 
         <header-file src="src/ios/BRPingOperation.h" />
         <source-file src="src/ios/BRPingOperation.m" />
