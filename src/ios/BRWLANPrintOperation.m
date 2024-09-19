@@ -60,32 +60,24 @@
 }
 
 - (void)main {
-  //  NSLog(@"==== in main with callback id               ");
-
     self.isExecutingForWLAN = YES;
 
+    // Set up the printer
     [self.ptp setIPAddress:self.ipAddress];
+    [self.ptp setPrintInfo:self.printInfo];
 
-    if ([self.ptp isPrinterReady]) {
-        self.communicationResultForWLAN = [self.ptp startCommunication];
-        if (self.communicationResultForWLAN) {
+    // Attempt to print
+    _errorCode = [self.ptp printImage:self.imgRef copy:self.numberOfPaper];
+    NSLog(@"==== in main error code in instance is %d", self.errorCode);
 
-            [self.ptp setPrintInfo:self.printInfo];
-
-            _errorCode = [self.ptp printImage:self.imgRef copy:self.numberOfPaper];
-            NSLog(@"==== in main error code in instance is %d", self.errorCode);
-
-            if (_errorCode == ERROR_NONE_) {
-                PTSTATUSINFO resultstatus;
-                [self.ptp getPTStatus:&resultstatus];
-                _resultStatus = resultstatus;
-            }
-
-        }
-        [self.ptp endCommunication];
-
+    if (_errorCode == ERROR_NONE_) {
+        self.communicationResultForWLAN = YES;
+        PTSTATUSINFO resultstatus;
+        [self.ptp getPTStatus:&resultstatus];
+        _resultStatus = resultstatus;
     } else {
         self.communicationResultForWLAN = NO;
+        NSLog(@"Printing failed with error code: %d", _errorCode);
     }
 
     self.isExecutingForWLAN = NO;
