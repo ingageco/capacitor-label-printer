@@ -188,27 +188,24 @@
 
 #pragma mark - Plugin Commands
 
-- (void)findNetworkPrinters:(CDVInvokedUrlCommand *)command {
+- (void)findNetworkPrinters:(CAPPPluginCall *)call {
   //  NSLog(@"==== in findNetworkPrinters with callback id                = %@", command.callbackId);
 
 //	[self.commandDelegate runInBackground:^{
     [self networkPrintersWithCompletion:^(NSArray *networkPrinters, NSError *error) {
         if (error) {
-            [self.commandDelegate
-                    sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]]
-                          callbackId:command.callbackId];
+            call.reject([error localizedDescription]);
             return;
         }
 
-        [self.commandDelegate
-                sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:networkPrinters]
-                      callbackId:command.callbackId];
+
+        call.resolve(networkPrinters)
 
     }];
 //    }];
 }
 
-// - (void)findBluetoothPrinters:(CDVInvokedUrlCommand *)command {
+// - (void)findBluetoothPrinters:(CAPPPluginCall *)call {
 // //	[self.commandDelegate runInBackground:^{
 //     [self pairedDevicesWithCompletion:^(NSArray *bluetoothPrinters, NSError *error) {
 //         if (error) {
@@ -225,10 +222,9 @@
 // //    }];
 // }
 
-- (void)findPrinters:(CDVInvokedUrlCommand *)command {
-    NSLog(@"==== in findPrinters with callback id                = %@", command.callbackId);
+- (void)findPrinters:(CAPPPluginCall *)call {
 
-    [self findNetworkPrinters:command];
+    [self findNetworkPrinters:call];
     return;
 
 //    [[BRPtouchBluetoothManager sharedManager] brShowBluetoothAccessoryPickerWithNameFilter:nil];
@@ -254,50 +250,42 @@
 //    }];
 }
 
-- (void)setPrinter:(CDVInvokedUrlCommand *)command {
+- (void)setPrinter:(CAPPPluginCall *)call {
   //  NSLog(@"==== in setPrinter with callback id                = %@", command.callbackId);
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSDictionary *obj = command.arguments[0];
-    if (!obj) {
-        [self.commandDelegate
-                sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Expected an object as the first argument."]
-                      callbackId:command.callbackId];
-        return;
-    }
 
-    NSString *ipAddress = obj[@"ipAddress"];
-    NSString *modelName = obj[@"modelName"];
-    NSString *paperLabelName = obj[@"paperLabelName"];
-    NSString *numberOfCopies = obj[@"numberOfCopies"];
-    NSString *orientation = obj[@"orientation"];
-    NSString *customPaperFilePath = obj[@"customPaperFilePath"];
-    NSString *serialNumber = obj[@"serialNumber"];
+    NSString *ipAddress = call.options[@"ipAddress"];
+    NSString *modelName = call.options[@"modelName"];
+    NSString *paperLabelName = call.options[@"paperLabelName"];
+    NSString *numberOfCopies = call.options[@"numberOfCopies"];
+    NSString *orientation = call.options[@"orientation"];
+    NSString *customPaperFilePath = call.options[@"customPaperFilePath"];
+    NSString *serialNumber = call.options[@"serialNumber"];
     
     if (!modelName) {
-        [self.commandDelegate
-                sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Expected a \"modelName\" key in the given object"]
-                      callbackId:command.callbackId];
+
+        call.reject("Expected a modelName key in the given object");
         return;
     }
     [userDefaults
             setObject:modelName
                forKey:kSelectedDevice];
 
-    NSString *port = obj[@"port"];
+    NSString *port = call.options[@"port"];
     if (!port) {
-        [self.commandDelegate
-                sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Expected a \"port\" key in the given object"]
-                      callbackId:command.callbackId];
+
+        call.reject("Expected a port key in the given object");
+
         return;
     }
 
     if ([@"BLUETOOTH" isEqualToString:port]) {
         
         if(!serialNumber){
-            [self.commandDelegate
-                    sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Expected a \"serialNumber\" key in the given object for BlueTooth devices"]
-                          callbackId:command.callbackId];
+
+            call.reject("Expected a serialNumber key in the given object for BlueTooth devices");
+
             return;
         }
         [userDefaults
@@ -361,9 +349,7 @@
     [userDefaults synchronize];
 
     // Send okay
-    [self.commandDelegate
-            sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK]
-                  callbackId:command.callbackId];
+    call.resolve();
 
   //  NSLog(@"==== in setPrinter with callback id                = %@ END", command.callbackId);
 
@@ -394,13 +380,12 @@
     return [userDefaults doubleForKey:key];
 }
 
-- (void)printViaSDK:(CDVInvokedUrlCommand *)command {
+- (void)printViaSDK:(CAPPPluginCall *)call {
  //   NSLog(@"==== in printViaSdk with callback id                = %@", command.callbackId);
     NSString *base64Data = command.arguments[0];
     if (base64Data == nil) {
-        [self.commandDelegate
-                sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Expected a string as the first argument."]
-                      callbackId:command.callbackId];
+
+        call.reject("Expected a string as the first argument.");
         return;
     }
 
@@ -544,7 +529,8 @@
 
         //[self.commandDelegate sendPluginResult:pluginResult callbackId: _printCallbackId];
 
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No printer was set"] callbackId:command.callbackId];
+        call.reject("No printer was set");
+
         _printCallbackId = nil;
         return;
     }
@@ -626,13 +612,9 @@
         NSLog(@"Error Code in BrotherPrinter is: %d", wlanOperation.errorCode);
         
         if (wlanOperation.errorCode != ERROR_NONE_) {
-            [self.commandDelegate
-                    sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[self errorMessageFromStatusInfo:wlanOperation.errorCode]] callbackId:_printCallbackId];
+            call.reject([self errorMessageFromStatusInfo:wlanOperation.errorCode]);
         } else {
-
-            [self.commandDelegate
-                    sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK]
-                          callbackId:_printCallbackId];
+            call.resolve();
         }
 
         _printCallbackId = nil;
@@ -643,9 +625,9 @@
     } else if ([keyPath isEqualToString:@"isFinishedForBT"]) {
         [operation removeObserver:self forKeyPath:@"isFinishedForBT"];
         [operation removeObserver:self forKeyPath:@"communicationResultForBT"];
-        [self.commandDelegate
-                sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK]
-                      callbackId:_printCallbackId];
+
+        call.resolve();
+
         _printCallbackId = nil;
         _image = nil;
     } else if ([keyPath isEqualToString:COMMUNICATION_RESULT_FOR_WLAN]) {
@@ -660,9 +642,7 @@
             [operation removeObserver:self forKeyPath:COMMUNICATION_RESULT_FOR_WLAN];
             PTSTATUSINFO resultStatus = wlanOperation.resultStatus;
 
-            [self.commandDelegate
-                    sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No print response received from Network printer"]
-                          callbackId:_printCallbackId];
+            call.reject("No print response received from Network printer");
 
             _printCallbackId = nil;
             _image = nil;
@@ -677,9 +657,9 @@
             [operation removeObserver:self forKeyPath:@"isFinishedForBT"];
             [operation removeObserver:self forKeyPath:@"communicationResultForBT"];
             PTSTATUSINFO resultStatus = bluetoothOperation.resultStatus;
-            [self.commandDelegate
-                sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Error occured while Bluetooth printing"]
-                        callbackId:_printCallbackId];
+
+            call.reject("Error occured while Bluetooth printing");
+
             _printCallbackId = nil;
             _image = nil;
         }

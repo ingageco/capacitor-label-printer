@@ -2,36 +2,80 @@
   "name": "@ingageco/capacitor-label-printer",
   "version": "0.0.2",
   "description": "Provide a native interface to label printers",
-  "cordova": {
-    "id": "capacitor-label-printer",
-    "platforms": [
-      "android",
-      "ios"
-    ]
-  },
+  "main": "dist/plugin.cjs.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "unpkg": "dist/plugin.js",
+  "files": [
+    "android/src/main/",
+    "android/build.gradle",
+    "dist/",
+    "ios/Plugin/",
+    "IngagecoCapacitorLabelPrinter.podspec"
+  ],
+  "author": "Diga Systems",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/digasystems/capacitor-label-printer"
+    "url": "git+https://github.com/digasystems/capacitor-label-printer.git"
   },
-  "keywords": [
-    "brother",
-    "print",
-    "sdk",
-    "label",
-    "ecosystem:cordova",
-    "cordova-ios",
-    "cordova-android"
-  ],
-  "engines": {
-    "cordova": ">=3.6.0",
-    "cordova-android": ">=6.0.0",
-    "android-sdk": ">=26",
-    "apple-ios": ">=10.0.0"
-  },
-  "author": "Diga Systems",
   "bugs": {
     "url": "https://github.com/digasystems/capacitor-label-printer/issues"
   },
-  "license": "MIT",
-  "homepage": "https://github.com/digasystems/capacitor-label-printer#readme"
+  "keywords": [
+    "capacitor",
+    "plugin",
+    "native",
+    "brother",
+    "print",
+    "sdk",
+    "label"
+  ],
+  "scripts": {
+    "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
+    "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin -destination generic/platform=iOS && cd ..",
+    "verify:android": "cd android && ./gradlew clean build test && cd ..",
+    "verify:web": "npm run build",
+    "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
+    "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
+    "eslint": "eslint . --ext ts",
+    "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
+    "swiftlint": "node-swiftlint",
+    "docgen": "docgen --api BrotherPrinterPlugin --output-readme README.md --output-json dist/docs.json",
+    "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
+    "clean": "rimraf ./dist",
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@ionic/eslint-config": "^0.3.0",
+    "@ionic/prettier-config": "^1.0.1",
+    "@ionic/swiftlint-config": "^1.1.2",
+    "eslint": "^7.11.0",
+    "prettier": "~2.3.0",
+    "prettier-plugin-java": "~1.0.2",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.32.0",
+    "swiftlint": "^1.0.1",
+    "typescript": "~4.1.5"
+  },
+  "peerDependencies": {
+    "@capacitor/core": "^6.0.0"
+  },
+  "prettier": "@ionic/prettier-config",
+  "swiftlint": "@ionic/swiftlint-config",
+  "eslintConfig": {
+    "extends": "@ionic/eslint-config/recommended"
+  },
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    },
+    "android": {
+      "src": "android"
+    }
+  }
 }
